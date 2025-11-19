@@ -13,8 +13,12 @@ class Player(Collidable):
         self.velocity: Vec3 = (0.0, 0.0, 0.0)
         self.speed: float = 5.0
         self.interaction_range: float = 3.0
+        self.rotation_y: float = 0.0  # Rotation angle in degrees (around Y axis)
 
     def draw(self) -> None:
+        # Apply rotation before drawing
+        glRotatef(self.rotation_y, 0, 1, 0)  # Rotate around Y axis
+        
         # --- Head (cube) ---
         # head bounds
         hx0, hx1 = -1.0, 1.0
@@ -268,7 +272,7 @@ class Player(Collidable):
 
     def get_collision_box(self) -> BoundingBox:
         """Player's collision box (approximate body bounds)."""
-        return BoundingBox(-1.2, 1.2, -3.0, 1.0, -0.6, 0.6)
+        return BoundingBox(-0.25, 0.25, 0.5, 1.2, -0.20, 0.20)
 
     def move(self, direction: Vec3, delta_time: float, collidables: List[Collidable]) -> None:
         """
@@ -278,6 +282,13 @@ class Player(Collidable):
         if direction == (0, 0, 0):
             self.velocity = (0.0, 0.0, 0.0)
             return
+
+        # Update rotation based on movement direction
+        if direction[0] != 0 or direction[2] != 0:
+            # Calculate angle in degrees
+            # atan2(x, z) gives us the angle, we negate z because OpenGL's Z is inverted
+            angle = math.degrees(math.atan2(direction[0], direction[2]))
+            self.rotation_y = angle
 
         # Calculate new position
         move_delta = (

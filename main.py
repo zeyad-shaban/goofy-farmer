@@ -8,6 +8,8 @@ from OpenGL.GL import *
 from OpenGL.GLU import gluPerspective, gluLookAt
 
 
+debug_mode = True
+
 def draw_ground():
     """Draw the ground plane."""
     from OpenGL.GL import glBegin, glEnd, glVertex3f, glColor3f, GL_QUADS
@@ -114,6 +116,10 @@ while running:
             glTranslatef(*obj.position)
             obj.draw()
             glPopMatrix()
+            
+    
+    if debug_mode:
+        world.draw_collisions()
 
     # Draw UI (dialogue box)
     world.dialogue_box.draw(*display)

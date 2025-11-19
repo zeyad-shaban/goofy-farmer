@@ -4,6 +4,7 @@ from typing import Optional, List
 from modules.player import Player
 from modules.base_classes import GameObject, Collidable
 from ui.dialogue_box import DialogueBox
+from utils.utils import draw_collision_box
 import math
 
 
@@ -52,3 +53,17 @@ class GameWorld:
         if interactable:
             message = self.player.interact_with(interactable)
             self.dialogue_box.show_message(message)
+
+    def draw_collisions(self):
+        for obj in self.objects:
+            if isinstance(obj, Collidable):
+                glPushMatrix()
+                glTranslatef(*obj.position)
+
+                # Draw in different colors for different objects
+                if isinstance(obj, Player):
+                    draw_collision_box(obj.get_collision_box(), (0.0, 1.0, 0.0, 0.5))  # Green for player
+                else:
+                    draw_collision_box(obj.get_collision_box(), (1.0, 0.0, 0.0, 0.5))  # Red for others
+
+                glPopMatrix()
