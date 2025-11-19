@@ -1,8 +1,7 @@
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from typing import Optional, List
-from base_classes import Vec3, Collidable, Interactable, GameObject
-from bounding_box import BoundingBox
+from .base_classes import Vec3, Collidable, Interactable, GameObject, BoundingBox
 import math
 
 

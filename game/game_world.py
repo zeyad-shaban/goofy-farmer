@@ -1,8 +1,9 @@
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from typing import Optional, List
-from modules import Player, GameObject, Collidable
-from ui import DialogueBox
+from modules.player import Player
+from modules.base_classes import GameObject, Collidable
+from ui.dialogue_box import DialogueBox
 import math
 
 

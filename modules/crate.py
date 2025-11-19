@@ -1,9 +1,8 @@
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from typing import Optional, List
-from base_classes import Vec3, Collidable, Interactable, GameObject
-from bounding_box import BoundingBox
-from player import Player
+from .base_classes import Vec3, Collidable, Interactable, BoundingBox
+from .player import Player
 import math
 
 
@@ -61,6 +60,7 @@ class Crate(Collidable, Interactable):
 
     def on_interact(self, interactor: Player) -> str:
         """Handle interaction with the crate."""
+        print("interacted with lol")
         if not self.has_been_opened:
             self.has_been_opened = True
             return "You opened the crate! It's empty..."
