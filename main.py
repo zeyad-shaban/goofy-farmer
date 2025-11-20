@@ -8,9 +8,7 @@ from OpenGL.GL import *
 from OpenGL.GLU import gluPerspective, gluLookAt
 from utils.load_texture import pls_load_texture
 
-# ---------------------------
-# CAMERA SETTINGS
-# ---------------------------
+
 camera_zoom_z = 10.0   # Starting camera distance
 MIN_ZOOM_Z = 3.0       # Closest zoom allowed
 MAX_ZOOM_Z = 20.0      # Furthest zoom allowed
