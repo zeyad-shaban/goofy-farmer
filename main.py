@@ -81,28 +81,46 @@ running = True
 while running:
     delta_time = clock.tick(60) / 1000.0
 
-    # Handle events
+    # --- SINGLE EVENT LOOP START ---
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-        if event.type == pygame.KEYDOWN:
+        elif event.type == pygame.KEYDOWN:
+            # Game Controls
             if event.key == pygame.K_ESCAPE:
                 running = False
             elif event.key == pygame.K_e:
                 world.handle_player_interaction()
+            
+            # Hotbar Selection (1-5)
+            elif event.key == pygame.K_1:
+                world.hotbar.select_slot(0)
+            elif event.key == pygame.K_2:
+                world.hotbar.select_slot(1)
+            elif event.key == pygame.K_3:
+                world.hotbar.select_slot(2)
+            elif event.key == pygame.K_4:
+                world.hotbar.select_slot(3)
+            elif event.key == pygame.K_5:
+                world.hotbar.select_slot(4)
 
-        # Mouse scroll zoom
+        # Hotbar Scroll 
+        elif event.type == pygame.MOUSEWHEEL:
+            world.hotbar.scroll(-event.y)
+ 
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            zoom_step = 1.0
-            if event.button == 4:
-                camera_zoom_z -= zoom_step
-            elif event.button == 5:
-                camera_zoom_z += zoom_step
-
+            if keys[pygame.K_LCTRL] or keys[pygame.K_RCTRL]:
+                zoom_step = 1.0
+                if event.button == 4: # Scroll Up
+                 camera_zoom_z -= zoom_step
+                elif event.button == 5: # Scroll Down
+                 camera_zoom_z += zoom_step
+            
             camera_zoom_z = max(MIN_ZOOM_Z, min(MAX_ZOOM_Z, camera_zoom_z))
+  
 
-    # Movement keys
+
     keys = pygame.key.get_pressed()
     direction = [0.0, 0.0, 0.0]
 
@@ -160,6 +178,7 @@ while running:
 
     # UI
     world.dialogue_box.draw(*display)
+    world.hotbar.draw(*display)  
 
     pygame.display.flip()
 
