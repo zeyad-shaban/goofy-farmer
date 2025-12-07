@@ -5,7 +5,8 @@ from modules.player import Player
 from modules.base_classes import GameObject, Collidable
 from ui.dialogue_box import DialogueBox
 from utils.utils import draw_collision_box
-from ui.hotbar import Hotbar  
+from ui.hotbar import Hotbar
+from ui.inventory import Inventory
 import math
 
 
@@ -17,6 +18,8 @@ class GameWorld:
         self.player: Optional[Player] = None
         self.dialogue_box = DialogueBox()
         self.hotbar = Hotbar()
+        self.inventory = Inventory()
+
     def add_object(self, obj: GameObject) -> None:
         """Add an object to the world."""
         self.objects.append(obj)

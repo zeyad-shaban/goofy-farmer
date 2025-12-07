@@ -92,6 +92,8 @@ while running:
                 running = False
             elif event.key == pygame.K_e:
                 world.handle_player_interaction()
+            elif event.key == pygame.K_TAB:
+                world.inventory.toggle()
             
             # Hotbar Selection (1-5)
             elif event.key == pygame.K_1:
@@ -106,7 +108,7 @@ while running:
                 world.hotbar.select_slot(4)
 
         # Hotbar Scroll 
-        elif event.type == pygame.MOUSEWHEEL:
+        elif event.type == pygame.MOUSEWHEEL and not (keys[pygame.K_LCTRL] or keys[pygame.K_RCTRL]):
             world.hotbar.scroll(-event.y)
  
         elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -179,6 +181,7 @@ while running:
     # UI
     world.dialogue_box.draw(*display)
     world.hotbar.draw(*display)  
+    world.inventory.draw(*display)
 
     pygame.display.flip()
 
