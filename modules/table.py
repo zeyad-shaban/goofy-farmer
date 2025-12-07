@@ -4,8 +4,8 @@ from modules.base_classes import BoundingBox, Collidable
 
 
 class Table(Collidable):
-    def __init__(self, position=(0, 0, 0)):
-        super().__init__(position)
+    def __init__(self, position=(0, 0, 0), size=(1, 1, 1)):
+        super().__init__(position, size)
         self.top_width = 2.0
         self.top_depth = 1.0
         self.top_height = 0.1

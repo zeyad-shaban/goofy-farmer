@@ -64,6 +64,7 @@ class GameWorld:
             if isinstance(obj, Collidable):
                 glPushMatrix()
                 glTranslatef(*obj.position)
+                glScalef(*obj.size)
 
                 # Draw in different colors for different objects
                 if isinstance(obj, Player):

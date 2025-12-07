@@ -9,6 +9,7 @@ from pygame.locals import DOUBLEBUF, OPENGL
 from OpenGL.GL import *
 from OpenGL.GLU import gluPerspective, gluLookAt
 from utils.load_texture import pls_load_texture
+from OpenGL.GL import glBegin, glEnd, glVertex3f, glColor3f, GL_QUADS, glTexCoord2f
 
 
 camera_zoom_z = 10.0  # Starting camera distance
@@ -20,8 +21,6 @@ debug_mode = True
 
 def draw_ground():
     """Draw ground plane with grass texture."""
-    from OpenGL.GL import glBegin, glEnd, glVertex3f, glColor3f, GL_QUADS, glTexCoord2f
-
     glBindTexture(GL_TEXTURE_2D, grass_texture_id)
     glColor3f(1.0, 1.0, 1.0)
 
@@ -67,12 +66,12 @@ world = GameWorld()
 player = Player(position=(0, 0, 0))
 world.add_object(player)
 
-world.add_object(Crate(position=(5, 0, 0)))
-world.add_object(Crate(position=(-5, 0, 0)))
-world.add_object(Crate(position=(0, 0, 5)))
-world.add_object(Crate(position=(3, 0, -3)))
-world.add_object(Table(position=(8, 0, 0)))
-world.add_object(Hoe(position=(8, 1.01, 0)))
+world.add_object(Crate(position=(5, 0, 0), size=(0.5, 0.5, 0.5)))
+world.add_object(Crate(position=(-5, 0, 0), size=(0.5, 0.5, 0.5)))
+world.add_object(Crate(position=(0, 0, 5), size=(0.5, 0.5, 0.5)))
+world.add_object(Crate(position=(3, 0, -3), size=(0.5, 0.5, 0.5)))
+world.add_object(Table(position=(8, 0, 0), size=(0.7, 0.7, 0.7)))
+world.add_object(Hoe(position=(8, 0.8, 0), size=(0.7, 0.7, 0.7)))
 
 # main
 clock = pygame.time.Clock()
@@ -145,7 +144,14 @@ while running:
     # Camera to follow player
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
-    gluLookAt(player.position[0], 5, player.position[2] + camera_zoom_z, player.position[0], player.position[1], player.position[2], 0, 1, 0)  # camera position  # target (player)  # up vector
+    # fmt: off
+    gluLookAt(
+        player.position[0], player.position[1] + 8, player.position[2] + camera_zoom_z,
+        player.position[0], player.position[1] + 1, player.position[2],
+        0, 1, 0,
+    )
+    # fmt: on
+
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
@@ -164,6 +170,7 @@ while running:
         if obj is not player:
             glPushMatrix()
             glTranslatef(*obj.position)
+            glScalef(*obj.size)
             obj.draw()
             glPopMatrix()
 

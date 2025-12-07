@@ -11,53 +11,52 @@ class Crate(Collidable, Interactable):
     """A crate that can be collided with and interacted with."""
 
     def __init__(self, position: Vec3 = (0.0, 0.0, 0.0), size=0.8):
-        super().__init__(position)
+        super().__init__(position, size)
         self.has_been_opened = False
-        self.size = size
 
     def draw(self) -> None:
         """Draw a simple crate."""
-        size = self.size
+        local_size = 1
 
         glColor3f(0.6, 0.4, 0.2)  # Brown color
 
         glBegin(GL_QUADS)
         # Front
-        glVertex3f(-size, 0, size)
-        glVertex3f(size, 0, size)
-        glVertex3f(size, size * 2, size)
-        glVertex3f(-size, size * 2, size)
+        glVertex3f(-local_size, 0, local_size)
+        glVertex3f(local_size, 0, local_size)
+        glVertex3f(local_size, local_size * 2, local_size)
+        glVertex3f(-local_size, local_size * 2, local_size)
         # Back
-        glVertex3f(size, 0, -size)
-        glVertex3f(-size, 0, -size)
-        glVertex3f(-size, size * 2, -size)
-        glVertex3f(size, size * 2, -size)
+        glVertex3f(local_size, 0, -local_size)
+        glVertex3f(-local_size, 0, -local_size)
+        glVertex3f(-local_size, local_size * 2, -local_size)
+        glVertex3f(local_size, local_size * 2, -local_size)
         # Left
-        glVertex3f(-size, 0, -size)
-        glVertex3f(-size, 0, size)
-        glVertex3f(-size, size * 2, size)
-        glVertex3f(-size, size * 2, -size)
+        glVertex3f(-local_size, 0, -local_size)
+        glVertex3f(-local_size, 0, local_size)
+        glVertex3f(-local_size, local_size * 2, local_size)
+        glVertex3f(-local_size, local_size * 2, -local_size)
         # Right
-        glVertex3f(size, 0, size)
-        glVertex3f(size, 0, -size)
-        glVertex3f(size, size * 2, -size)
-        glVertex3f(size, size * 2, size)
+        glVertex3f(local_size, 0, local_size)
+        glVertex3f(local_size, 0, -local_size)
+        glVertex3f(local_size, local_size * 2, -local_size)
+        glVertex3f(local_size, local_size * 2, local_size)
         # Top
-        glVertex3f(-size, size * 2, size)
-        glVertex3f(size, size * 2, size)
-        glVertex3f(size, size * 2, -size)
-        glVertex3f(-size, size * 2, -size)
+        glVertex3f(-local_size, local_size * 2, local_size)
+        glVertex3f(local_size, local_size * 2, local_size)
+        glVertex3f(local_size, local_size * 2, -local_size)
+        glVertex3f(-local_size, local_size * 2, -local_size)
         # Bottom
-        glVertex3f(-size, 0, -size)
-        glVertex3f(size, 0, -size)
-        glVertex3f(size, 0, size)
-        glVertex3f(-size, 0, size)
+        glVertex3f(-local_size, 0, -local_size)
+        glVertex3f(local_size, 0, -local_size)
+        glVertex3f(local_size, 0, local_size)
+        glVertex3f(-local_size, 0, local_size)
         glEnd()
 
     def get_collision_box(self) -> BoundingBox:
         """Crate collision box."""
-        size = self.size
-        return BoundingBox(-size, size, 0, size * 2, -size, size)
+        local_size = 1
+        return BoundingBox(-local_size, local_size, 0, local_size * 2, -local_size, local_size)
 
     def on_interact(self, interactor: Player) -> str:
         """Handle interaction with the crate."""

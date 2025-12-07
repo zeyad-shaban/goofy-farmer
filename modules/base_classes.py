@@ -39,8 +39,9 @@ class BoundingBox:
 class GameObject(ABC):
     """Base class for all game objects."""
 
-    def __init__(self, position: Vec3 = (0.0, 0.0, 0.0)):
+    def __init__(self, position: Vec3 = (0.0, 0.0, 0.0), size: Vec3 = (1, 1, 1)):
         self.position: Vec3 = position
+        self.size: Vec3 = size
 
     @abstractmethod
     def draw(self) -> None:
@@ -61,8 +62,17 @@ class Collidable(GameObject):
         pass
 
     def get_world_collision_box(self) -> BoundingBox:
-        """Return the collision box in world coordinates."""
-        return self.get_collision_box().translate(self.position)
+        """Return the collision box in world coordinates with scaling applied."""
+        local_box = self.get_collision_box()
+        scaled_box = BoundingBox(
+            local_box.min_x * self.size[0],
+            local_box.max_x * self.size[0],
+            local_box.min_y * self.size[1],
+            local_box.max_y * self.size[1],
+            local_box.min_z * self.size[2],
+            local_box.max_z * self.size[2],
+        )
+        return scaled_box.translate(self.position)
 
     def collides_with(self, other: "Collidable") -> bool:
         """Check if this object collides with another collidable object."""

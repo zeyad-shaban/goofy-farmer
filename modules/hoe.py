@@ -5,8 +5,8 @@ from .player import Player
 
 
 class Hoe(GameObject, Interactable):
-    def __init__(self, position=(0, 0, 0)):
-        super().__init__(position)
+    def __init__(self, position=(0, 0, 0), size=(1, 1, 1)):
+        super().__init__(position, size)
 
     def draw(self):
         # Brown wooden handle
