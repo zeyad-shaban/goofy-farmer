@@ -3,21 +3,22 @@ from OpenGL.GLU import *
 from typing import Optional, List
 from .base_classes import Vec3, Collidable, Interactable, BoundingBox
 from .player import Player
+from OpenGL.GL import glBegin, glEnd, glVertex3f, glColor3f, GL_QUADS
 import math
 
 
 class Crate(Collidable, Interactable):
     """A crate that can be collided with and interacted with."""
 
-    def __init__(self, position: Vec3 = (0.0, 0.0, 0.0)):
+    def __init__(self, position: Vec3 = (0.0, 0.0, 0.0), size=0.8):
         super().__init__(position)
         self.has_been_opened = False
+        self.size = size
 
     def draw(self) -> None:
         """Draw a simple crate."""
-        from OpenGL.GL import glBegin, glEnd, glVertex3f, glColor3f, GL_QUADS
+        size = self.size
 
-        size = 1.0
         glColor3f(0.6, 0.4, 0.2)  # Brown color
 
         glBegin(GL_QUADS)
@@ -55,7 +56,7 @@ class Crate(Collidable, Interactable):
 
     def get_collision_box(self) -> BoundingBox:
         """Crate collision box."""
-        size = 1.0
+        size = self.size
         return BoundingBox(-size, size, 0, size * 2, -size, size)
 
     def on_interact(self, interactor: Player) -> str:

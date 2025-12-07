@@ -1,6 +1,8 @@
 from game.game_world import GameWorld
 from modules.player import Player
 from modules.crate import Crate
+from modules.hoe import Hoe
+from modules.table import Table
 import math
 import pygame
 from pygame.locals import DOUBLEBUF, OPENGL
@@ -9,12 +11,11 @@ from OpenGL.GLU import gluPerspective, gluLookAt
 from utils.load_texture import pls_load_texture
 
 
-camera_zoom_z = 10.0   # Starting camera distance
-MIN_ZOOM_Z = 3.0       # Closest zoom allowed
-MAX_ZOOM_Z = 20.0      # Furthest zoom allowed
+camera_zoom_z = 10.0  # Starting camera distance
+MIN_ZOOM_Z = 3.0  # Closest zoom allowed
+MAX_ZOOM_Z = 20.0  # Furthest zoom allowed
 
 debug_mode = True
-
 
 
 def draw_ground():
@@ -41,7 +42,6 @@ def draw_ground():
 
     glEnd()
     glBindTexture(GL_TEXTURE_2D, 0)
-
 
 
 pygame.init()
@@ -71,10 +71,10 @@ world.add_object(Crate(position=(5, 0, 0)))
 world.add_object(Crate(position=(-5, 0, 0)))
 world.add_object(Crate(position=(0, 0, 5)))
 world.add_object(Crate(position=(3, 0, -3)))
+world.add_object(Table(position=(8, 0, 0)))
+world.add_object(Hoe(position=(8, 1.01, 0)))
 
-
-#main
-
+# main
 clock = pygame.time.Clock()
 running = True
 
@@ -94,7 +94,7 @@ while running:
                 world.handle_player_interaction()
             elif event.key == pygame.K_TAB:
                 world.inventory.toggle()
-            
+
             # Hotbar Selection (1-5)
             elif event.key == pygame.K_1:
                 world.hotbar.select_slot(0)
@@ -107,21 +107,19 @@ while running:
             elif event.key == pygame.K_5:
                 world.hotbar.select_slot(4)
 
-        # Hotbar Scroll 
+        # Hotbar Scroll
         elif event.type == pygame.MOUSEWHEEL and not (keys[pygame.K_LCTRL] or keys[pygame.K_RCTRL]):
             world.hotbar.scroll(-event.y)
- 
+
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if keys[pygame.K_LCTRL] or keys[pygame.K_RCTRL]:
                 zoom_step = 1.0
-                if event.button == 4: # Scroll Up
-                 camera_zoom_z -= zoom_step
-                elif event.button == 5: # Scroll Down
-                 camera_zoom_z += zoom_step
-            
-            camera_zoom_z = max(MIN_ZOOM_Z, min(MAX_ZOOM_Z, camera_zoom_z))
-  
+                if event.button == 4:  # Scroll Up
+                    camera_zoom_z -= zoom_step
+                elif event.button == 5:  # Scroll Down
+                    camera_zoom_z += zoom_step
 
+            camera_zoom_z = max(MIN_ZOOM_Z, min(MAX_ZOOM_Z, camera_zoom_z))
 
     keys = pygame.key.get_pressed()
     direction = [0.0, 0.0, 0.0]
@@ -144,15 +142,10 @@ while running:
     # Update world
     world.update(delta_time)
 
-  # Camera to follow player
+    # Camera to follow player
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
-    gluLookAt(
-        player.position[0], 5, player.position[2] + camera_zoom_z,  # camera position
-        player.position[0], player.position[1], player.position[2],  # target (player)
-        0, 1, 0                                                     # up vector
-    )
-
+    gluLookAt(player.position[0], 5, player.position[2] + camera_zoom_z, player.position[0], player.position[1], player.position[2], 0, 1, 0)  # camera position  # target (player)  # up vector
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
@@ -180,7 +173,7 @@ while running:
 
     # UI
     world.dialogue_box.draw(*display)
-    world.hotbar.draw(*display)  
+    world.hotbar.draw(*display)
     world.inventory.draw(*display)
 
     pygame.display.flip()
