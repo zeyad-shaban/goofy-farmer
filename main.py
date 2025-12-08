@@ -92,13 +92,12 @@ while running:
             if event.key == pygame.K_ESCAPE:
                 if world.opened_chest:
                     world.close_chest()
-                    if hasattr(world.player, "inventory") and world.player.inventory.is_open:
-                        world.player.inventory.is_open = False
+                    world.player.inventory.is_open = False
                 else:
-                    if not (hasattr(world.player, "inventory") and world.player.inventory.is_open):
-                        running = False
-                    else:
+                    if world.player.inventory.is_open:
                         world.inventory.is_open = False
+                    else:
+                        running = False
 
             elif event.key == pygame.K_e:
                 # Check if clicking on chest
@@ -116,13 +115,9 @@ while running:
                 # Close chest if open, otherwise toggle inventory
                 if world.opened_chest:
                     world.close_chest()
-                    # Also close player inventory if open
-                    if hasattr(world.player, "inventory") and world.player.inventory.is_open:
-                        world.player.inventory.is_open = False
+                    world.player.inventory.is_open = False
                 else:
-                    # Toggle player inventory
-                    if hasattr(world.player, "inventory"):
-                        world.player.inventory.is_open = not world.player.inventory.is_open
+                    world.player.inventory.is_open = not world.player.inventory.is_open
 
             # Hotbar Selection (1-5)
             elif event.key == pygame.K_1:
@@ -216,10 +211,14 @@ while running:
     world.dialogue_box.draw(*display)
     world.hotbar.draw(*display)
 
+    # paleyr inventory
+    if world.player.inventory.is_open and not world.opened_chest:
+        world.player.inventory.draw(*display, "Inventory", 100)
+
+    # both inventories
     if world.opened_chest:
-        # Draw chest inventory at top
         world.opened_chest.inventory.draw(*display, "Chest", display[1] // 2)
-        # Draw player inventory at bottom
+
         if world.player:
             world.player.inventory.draw(*display, "Inventory", 100)
 

@@ -16,7 +16,7 @@ class GameWorld:
 
     def __init__(self):
         self.objects: List[GameObject] = []
-        self.player: Optional[Player] = None
+        self.player: [Player] = None
         self.dialogue_box = DialogueBox()
         self.hotbar = Hotbar()
         self.inventory = Inventory()

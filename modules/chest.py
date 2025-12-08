@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 class Chest(Interactable, Collidable):  
     def __init__(self, position=(0, 0, 0), size=(1.0, 1.0, 1.0)):  
         super().__init__(position, size)  
-        self.inventory = Inventory(rows=3, cols=9)  # Chest has 3x9 inventory  
+        self.inventory = Inventory(rows=3, cols=5)  # Chest has 3x9 inventory  
         self.is_open = False  
       
     def draw(self):  
