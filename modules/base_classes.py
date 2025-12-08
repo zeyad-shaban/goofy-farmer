@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Tuple, TYPE_CHECKING
 from dataclasses import dataclass
+from .items import Item  
+
 
 if TYPE_CHECKING:
     from .player import Player
@@ -94,3 +96,22 @@ class Interactable(ABC):
     def get_interaction_prompt(self) -> str:
         """Return the prompt text (e.g., 'Press E to interact')."""
         pass
+
+
+class Pickable(ABC):
+    """Interface for objects that can be picked up by the player."""
+
+    @abstractmethod
+    def get_item_type(self) -> "ItemType":
+        """Return the item type when picked up."""
+        pass
+
+    @staticmethod
+    def try_pickup_item(pickable_obj: "Pickable", interactor: "Player") -> str:
+        """Shared pickup logic for all pickable items."""
+        item = Item(pickable_obj.get_item_type(), 1)  
+        if interactor.add_item(item):  
+            return f"Picked up {pickable_obj.get_item_type().value}!"  
+        
+        return "No space in inventory!"
+

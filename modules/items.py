@@ -5,6 +5,7 @@ from typing import Optional, Tuple
 class ItemType(Enum):
     TOMATO_SEED = "tomato_seed"
     BURGER = "burger"
+    HOE = "hoe"
 
 
 class Item:
@@ -18,6 +19,7 @@ class Item:
         colors = {
             ItemType.TOMATO_SEED: (0.8, 0.2, 0.2),  # Red
             ItemType.BURGER: (0.8, 0.6, 0.2),  # Yellow-brown
+            ItemType.HOE: (0, 0, 0), # Black
         }
         return colors.get(self.type, (0.5, 0.5, 0.5))
 
@@ -26,5 +28,6 @@ class Item:
         names = {
             ItemType.TOMATO_SEED: "Tomato Seed",
             ItemType.BURGER: "Burger",
+            ItemType.HOE: "Hoe",
         }
         return names.get(self.type, "Unknown")

@@ -121,19 +121,19 @@ while running:
 
             # Hotbar Selection (1-5)
             elif event.key == pygame.K_1:
-                world.hotbar.select_slot(0)
+                world.player.hotbar.select_slot(0)
             elif event.key == pygame.K_2:
-                world.hotbar.select_slot(1)
+                world.player.hotbar.select_slot(1)
             elif event.key == pygame.K_3:
-                world.hotbar.select_slot(2)
+                world.player.hotbar.select_slot(2)
             elif event.key == pygame.K_4:
-                world.hotbar.select_slot(3)
+                world.player.hotbar.select_slot(3)
             elif event.key == pygame.K_5:
-                world.hotbar.select_slot(4)
+                world.player.hotbar.select_slot(4)
 
         # Hotbar Scroll
         elif event.type == pygame.MOUSEWHEEL and not (keys[pygame.K_LCTRL] or keys[pygame.K_RCTRL]):
-            world.hotbar.scroll(-event.y)
+            world.player.hotbar.scroll(-event.y)
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if world.opened_chest:
@@ -209,7 +209,7 @@ while running:
 
     # UI
     world.dialogue_box.draw(*display)
-    world.hotbar.draw(*display)
+    world.player.hotbar.draw(*display)
 
     # paleyr inventory
     if world.player.inventory.is_open and not world.opened_chest:

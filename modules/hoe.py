@@ -1,14 +1,19 @@
 from OpenGL.GL import *
-from .base_classes import GameObject, Collidable, Interactable
+from .base_classes import GameObject, Collidable, Interactable, Pickable
 from typing import TYPE_CHECKING
 from .player import Player
+from .items import Item, ItemType
 
 
-class Hoe(GameObject, Interactable):
+class Hoe(GameObject, Interactable, Pickable):
     def __init__(self, position=(0, 0, 0), size=(1, 1, 1)):
         super().__init__(position, size)
+        self.picked_up = False
 
     def draw(self):
+        if self.picked_up:
+            return
+
         # Brown wooden handle
         glColor3f(0.55, 0.27, 0.07)  # Brown color
         glBegin(GL_QUADS)
@@ -69,7 +74,17 @@ class Hoe(GameObject, Interactable):
         glEnd()
 
     def on_interact(self, interactor: "Player") -> str:
-        return "You picked up the hoe!"
+        return self.on_pickup(interactor)
 
     def get_interaction_prompt(self) -> str:
         return "Pick up hoe"
+
+    def get_item_type(self) -> ItemType:
+        return ItemType.HOE
+
+    def on_pickup(self, interactor: "Player") -> str:
+        """Pick up the hoe."""
+        result = Pickable.try_pickup_item(self, interactor)
+        if "Picked up" in result:
+            self.picked_up = True
+        return result

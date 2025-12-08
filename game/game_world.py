@@ -1,6 +1,6 @@
 from OpenGL.GL import *
 from OpenGL.GLU import *
-from typing import Optional, List
+from typing import Optional, List, Tuple
 from modules.player import Player
 from modules.base_classes import GameObject, Collidable
 from ui.dialogue_box import DialogueBox
@@ -16,9 +16,8 @@ class GameWorld:
 
     def __init__(self):
         self.objects: List[GameObject] = []
-        self.player: [Player] = None
+        self.player: list[Player] = None
         self.dialogue_box = DialogueBox()
-        self.hotbar = Hotbar()
         self.inventory = Inventory()
         self.opened_chest: Optional[Chest] = None
 
@@ -88,15 +87,62 @@ class GameWorld:
             self.opened_chest.is_open = False
             self.opened_chest = None
 
-    def handle_inventory_click(self, mouse_x: int, mouse_y: int, window_width: int, window_height: int):
-        """Handle mouse clicks on inventory slots."""
-        if not self.opened_chest or not self.player:
-            return
-
-        for row in range(self.opened_chest.inventory.rows):
-            for col in range(self.opened_chest.inventory.cols):
-                item = self.opened_chest.inventory.get_item(row, col)
-                if item:
-                    if self.player.inventory.add_item(item):
-                        self.opened_chest.inventory.remove_item(row, col)
-                    return
+    def handle_inventory_click(self, mouse_x: int, mouse_y: int, window_width: int, window_height: int):  
+        """Handle mouse clicks on inventory slots."""  
+        if not self.opened_chest or not self.player:  
+            return  
+        
+        # Check chest inventory click (top half)  
+        chest_clicked = self._get_clicked_slot(  
+            mouse_x, mouse_y, window_width, window_height,  
+            self.opened_chest.inventory, window_height // 2  
+        )  
+        
+        if chest_clicked:  
+            row, col = chest_clicked  
+            item = self.opened_chest.inventory.get_item(row, col)  
+            if item and self.player.inventory.add_item(item):  
+                self.opened_chest.inventory.remove_item(row, col)  
+            return  
+        
+        # Check player inventory click (bottom half)  
+        player_clicked = self._get_clicked_slot(  
+            mouse_x, mouse_y, window_width, window_height,  
+            self.player.inventory, 100  
+        )  
+        
+        if player_clicked:  
+            row, col = player_clicked  
+            # Transfer from player to chest  
+            item = self.player.inventory.get_item(row, col)  
+            if item and self.opened_chest.inventory.add_item(item):  
+                self.player.inventory.remove_item(row, col)  
+    
+    def _get_clicked_slot(self, mouse_x: int, mouse_y: int, window_width: int, window_height: int,   
+                        inventory: 'Inventory', offset_y: int) -> Optional[Tuple[int, int]]:  
+        """Get which slot was clicked based on mouse coordinates."""  
+        # Convert to openGL coords for Y (TL -> BL)
+        mouse_y_gl = window_height - mouse_y  
+        
+        # Calculate inventory position  
+        total_width = (inventory.slot_size * inventory.cols) + (inventory.padding * (inventory.cols - 1))  
+        start_x = (window_width - total_width) / 2  
+        start_y = offset_y  
+        
+        # Check if click is within inventory bounds  
+        if (mouse_x < start_x or mouse_x > start_x + total_width or  
+            mouse_y_gl < start_y or mouse_y_gl > start_y +   
+            (inventory.slot_size * inventory.rows) + (inventory.padding * (inventory.rows - 1))):  
+            return None  
+        
+        # Calculate which slot was clicked  
+        for row in range(inventory.rows):  
+            for col in range(inventory.cols):  
+                slot_x = start_x + (col * (inventory.slot_size + inventory.padding))  
+                slot_y = start_y + (row * (inventory.slot_size + inventory.padding))  
+                
+                if (slot_x <= mouse_x <= slot_x + inventory.slot_size and  
+                    slot_y <= mouse_y_gl <= slot_y + inventory.slot_size):  
+                    return (row, col)  
+        
+        return None

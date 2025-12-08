@@ -4,6 +4,7 @@ from typing import Optional, List
 from .base_classes import Vec3, Collidable, Interactable, GameObject, BoundingBox
 import math
 from ui.inventory import Inventory  
+from ui.hotbar import Hotbar
 from modules.items import Item, ItemType  
 
 
@@ -18,6 +19,7 @@ class Player(Collidable):
         self.interaction_range: float = 3.0
         self.rotation_y: float = 0.0  # Rotation angle in degrees (around Y axis)
         self.inventory = Inventory(rows=3, cols=9)
+        self.hotbar = Hotbar()
 
     def draw(self) -> None:
         # Apply rotation before drawing
@@ -277,6 +279,16 @@ class Player(Collidable):
     def get_collision_box(self) -> BoundingBox:
         """Player's collision box (approximate body bounds)."""
         return BoundingBox(-0.25, 0.25, 0.5, 1.2, -0.20, 0.20)
+
+    def add_item(self, item: 'Item') -> bool:  
+        """Add item to hotbar first, then inventory."""  
+        for i in range(len(self.hotbar.items)):  
+            if self.hotbar.items[i] is None:  
+                self.hotbar.items[i] = item  # type: ignore
+                return True  
+          
+        return self.inventory.add_item(item)
+
 
     def move(self, direction: Vec3, delta_time: float, collidables: List[Collidable]) -> None:
         """
