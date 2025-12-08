@@ -92,8 +92,13 @@ while running:
             if event.key == pygame.K_ESCAPE:
                 if world.opened_chest:
                     world.close_chest()
+                    if hasattr(world.player, "inventory") and world.player.inventory.is_open:
+                        world.player.inventory.is_open = False
                 else:
-                    running = False
+                    if not (hasattr(world.player, "inventory") and world.player.inventory.is_open):
+                        running = False
+                    else:
+                        world.inventory.is_open = False
 
             elif event.key == pygame.K_e:
                 # Check if clicking on chest
@@ -108,7 +113,16 @@ while running:
                         world.handle_player_interaction()
 
             elif event.key == pygame.K_TAB:
-                world.inventory.toggle()
+                # Close chest if open, otherwise toggle inventory
+                if world.opened_chest:
+                    world.close_chest()
+                    # Also close player inventory if open
+                    if hasattr(world.player, "inventory") and world.player.inventory.is_open:
+                        world.player.inventory.is_open = False
+                else:
+                    # Toggle player inventory
+                    if hasattr(world.player, "inventory"):
+                        world.player.inventory.is_open = not world.player.inventory.is_open
 
             # Hotbar Selection (1-5)
             elif event.key == pygame.K_1:
@@ -128,10 +142,10 @@ while running:
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if world.opened_chest:
-                if event.button == 1:  # Left click  
-                    world.handle_inventory_click(event.pos[0], event.pos[1], display[0], display[1])  
+                if event.button == 1:  # Left click
+                    world.handle_inventory_click(event.pos[0], event.pos[1], display[0], display[1])
 
-            else:    
+            else:
                 if keys[pygame.K_LCTRL] or keys[pygame.K_RCTRL]:
                     zoom_step = 1.0
                     if event.button == 4:  # Scroll Up
@@ -201,15 +215,13 @@ while running:
     # UI
     world.dialogue_box.draw(*display)
     world.hotbar.draw(*display)
-    world.inventory.draw(*display)
-    
-    if world.opened_chest:  
-        # Draw chest inventory at top  
-        world.opened_chest.inventory.draw(*display, "Chest", display[1] // 2)  
-        # Draw player inventory at bottom  
-        if world.player:  
-            world.player.inventory.draw(*display, "Inventory", 100)
 
+    if world.opened_chest:
+        # Draw chest inventory at top
+        world.opened_chest.inventory.draw(*display, "Chest", display[1] // 2)
+        # Draw player inventory at bottom
+        if world.player:
+            world.player.inventory.draw(*display, "Inventory", 100)
 
     pygame.display.flip()
 
