@@ -1,8 +1,5 @@
 from game.game_world import GameWorld
-from modules.player import Player
-from modules.crate import Crate
-from modules.hoe import Hoe
-from modules.table import Table
+from modules import Table, Chest, Hoe, Crate, Player, Item, ItemType
 import math
 import pygame
 from pygame.locals import DOUBLEBUF, OPENGL
@@ -73,6 +70,11 @@ world.add_object(Crate(position=(3, 0, -3), size=(0.5, 0.5, 0.5)))
 world.add_object(Table(position=(8, 0, 0), size=(0.7, 0.7, 0.7)))
 world.add_object(Hoe(position=(8, 0.8, 0), size=(0.7, 0.7, 0.7)))
 
+chest = Chest(position=(10, 0, 0))
+world.add_object(chest)
+chest.inventory.add_item(Item(ItemType.TOMATO_SEED, 5))
+chest.inventory.add_item(Item(ItemType.BURGER, 3))
+
 # main
 clock = pygame.time.Clock()
 running = True
@@ -88,9 +90,23 @@ while running:
         elif event.type == pygame.KEYDOWN:
             # Game Controls
             if event.key == pygame.K_ESCAPE:
-                running = False
+                if world.opened_chest:
+                    world.close_chest()
+                else:
+                    running = False
+
             elif event.key == pygame.K_e:
-                world.handle_player_interaction()
+                # Check if clicking on chest
+                if world.player:
+                    interactable = world.player.find_interactable(world.objects)
+                    if isinstance(interactable, Chest):
+                        if world.opened_chest == interactable:
+                            world.close_chest()
+                        else:
+                            world.open_chest(interactable)
+                    else:
+                        world.handle_player_interaction()
+
             elif event.key == pygame.K_TAB:
                 world.inventory.toggle()
 
@@ -111,14 +127,19 @@ while running:
             world.hotbar.scroll(-event.y)
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            if keys[pygame.K_LCTRL] or keys[pygame.K_RCTRL]:
-                zoom_step = 1.0
-                if event.button == 4:  # Scroll Up
-                    camera_zoom_z -= zoom_step
-                elif event.button == 5:  # Scroll Down
-                    camera_zoom_z += zoom_step
+            if world.opened_chest:
+                if event.button == 1:  # Left click  
+                    world.handle_inventory_click(event.pos[0], event.pos[1], display[0], display[1])  
 
-            camera_zoom_z = max(MIN_ZOOM_Z, min(MAX_ZOOM_Z, camera_zoom_z))
+            else:    
+                if keys[pygame.K_LCTRL] or keys[pygame.K_RCTRL]:
+                    zoom_step = 1.0
+                    if event.button == 4:  # Scroll Up
+                        camera_zoom_z -= zoom_step
+                    elif event.button == 5:  # Scroll Down
+                        camera_zoom_z += zoom_step
+
+                camera_zoom_z = max(MIN_ZOOM_Z, min(MAX_ZOOM_Z, camera_zoom_z))
 
     keys = pygame.key.get_pressed()
     direction = [0.0, 0.0, 0.0]
@@ -152,7 +173,6 @@ while running:
     )
     # fmt: on
 
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
     draw_ground()
@@ -182,6 +202,14 @@ while running:
     world.dialogue_box.draw(*display)
     world.hotbar.draw(*display)
     world.inventory.draw(*display)
+    
+    if world.opened_chest:  
+        # Draw chest inventory at top  
+        world.opened_chest.inventory.draw(*display, "Chest", display[1] // 2)  
+        # Draw player inventory at bottom  
+        if world.player:  
+            world.player.inventory.draw(*display, "Inventory", 100)
+
 
     pygame.display.flip()
 

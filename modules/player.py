@@ -3,6 +3,9 @@ from OpenGL.GLU import *
 from typing import Optional, List
 from .base_classes import Vec3, Collidable, Interactable, GameObject, BoundingBox
 import math
+from ui.inventory import Inventory  
+from modules.items import Item, ItemType  
+
 
 
 class Player(Collidable):
@@ -14,6 +17,7 @@ class Player(Collidable):
         self.speed: float = 5.0
         self.interaction_range: float = 3.0
         self.rotation_y: float = 0.0  # Rotation angle in degrees (around Y axis)
+        self.inventory = Inventory(rows=2, cols=9)
 
     def draw(self) -> None:
         # Apply rotation before drawing

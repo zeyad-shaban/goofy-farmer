@@ -7,6 +7,7 @@ from ui.dialogue_box import DialogueBox
 from utils.utils import draw_collision_box
 from ui.hotbar import Hotbar
 from ui.inventory import Inventory
+from modules.chest import Chest
 import math
 
 
@@ -19,6 +20,7 @@ class GameWorld:
         self.dialogue_box = DialogueBox()
         self.hotbar = Hotbar()
         self.inventory = Inventory()
+        self.opened_chest: Optional[Chest] = None
 
     def add_object(self, obj: GameObject) -> None:
         """Add an object to the world."""
@@ -73,3 +75,28 @@ class GameWorld:
                     draw_collision_box(obj.get_collision_box(), (1.0, 0.0, 0.0, 0.5))  # Red for others
 
                 glPopMatrix()
+
+    # chest handling
+    def open_chest(self, chest: Chest):
+        """Open a chest inventory UI."""
+        self.opened_chest = chest
+        chest.is_open = True
+
+    def close_chest(self):
+        """Close the currently open chest."""
+        if self.opened_chest:
+            self.opened_chest.is_open = False
+            self.opened_chest = None
+
+    def handle_inventory_click(self, mouse_x: int, mouse_y: int, window_width: int, window_height: int):
+        """Handle mouse clicks on inventory slots."""
+        if not self.opened_chest or not self.player:
+            return
+
+        for row in range(self.opened_chest.inventory.rows):
+            for col in range(self.opened_chest.inventory.cols):
+                item = self.opened_chest.inventory.get_item(row, col)
+                if item:
+                    if self.player.inventory.add_item(item):
+                        self.opened_chest.inventory.remove_item(row, col)
+                    return
