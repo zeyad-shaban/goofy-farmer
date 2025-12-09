@@ -7,6 +7,7 @@ class ItemType(Enum):
     TOMATO = "tomato"
     BURGER = "burger"
     HOE = "hoe"
+    COW = "cow"
 
 
 class Item:
@@ -21,7 +22,8 @@ class Item:
             ItemType.TOMATO_SEED: (0.8, 0.2, 0.2),  # Red
             ItemType.TOMATO: (0.9, 0.3, 0.2),  # Dark red
             ItemType.BURGER: (0.8, 0.6, 0.2),  # Yellow-brown
-            ItemType.HOE: (0, 0, 0), # Black
+            ItemType.HOE: (0, 0, 0),  # Black
+            ItemType.COW: (0.6, 0.4, 0.2),  # Brown
         }
         return colors.get(self.type, (0.5, 0.5, 0.5))
 
@@ -32,6 +34,7 @@ class Item:
             ItemType.TOMATO: "Tomato",
             ItemType.BURGER: "Burger",
             ItemType.HOE: "Hoe",
+            ItemType.COW: "Cow",
         }
         return names.get(self.type, "Unknown")
 
@@ -42,5 +45,17 @@ class Item:
             ItemType.TOMATO: "assets/tomato.png",
             ItemType.BURGER: "assets/burger.png",
             ItemType.HOE: "assets/hoe.png",
+            ItemType.COW: "assets/cow.png",
         }
         return texture_paths.get(self.type, None)
+
+    def get_price(self) -> float:
+        """Return the selling price of this item."""
+        prices = {
+            ItemType.TOMATO_SEED: 0.5,
+            ItemType.TOMATO: 5.0,
+            ItemType.BURGER: 3.0,
+            ItemType.HOE: 0.0,  # Can't sell tools
+            ItemType.COW: 100.0,
+        }
+        return prices.get(self.type, 0.0)

@@ -58,8 +58,12 @@ class DirtBlock(Collidable, Interactable):
                 # Plant the seed
                 self.plant_seed(hotbar_item, interactor)
                 return "Planted tomato seed!"
+            elif hotbar_item and hotbar_item.type == ItemType.BURGER:
+                # Plant burger seed
+                self.plant_seed(hotbar_item, interactor)
+                return "Planted burger seed!"
             else:
-                return "Need tomato seeds to plant"
+                return "Need tomato seeds or burger to plant"
 
         # State: PLANTED -> Can wait for growth or harvest
         elif self.state == BlockState.PLANTED:
@@ -104,6 +108,28 @@ class DirtBlock(Collidable, Interactable):
                     self.state = BlockState.FARMLAND
                     self.planted_item_type = None
                     return f"Harvested tomato + 2 seeds! Block ready to replant. ({self.uses_remaining} uses left)"
+            else:
+                return "Inventory full!"
+
+        elif self.planted_item_type == ItemType.BURGER:
+            # Give cow as harvest
+            harvest_item = Item(ItemType.COW, 1)
+            
+            if player.add_item(harvest_item):
+                self.uses_remaining -= 1
+                
+                # Check if this block has been used 3 times
+                if self.uses_remaining <= 0:
+                    # Return to dirt
+                    self.state = BlockState.DIRT
+                    self.planted_item_type = None
+                    self.uses_remaining = 3
+                    return "Harvested cow! Block returned to dirt."
+                else:
+                    # Return to farmland for replanting
+                    self.state = BlockState.FARMLAND
+                    self.planted_item_type = None
+                    return f"Harvested cow! Block ready to replant. ({self.uses_remaining} uses left)"
             else:
                 return "Inventory full!"
 

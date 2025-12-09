@@ -1,17 +1,18 @@
 from game.game_world import GameWorld
-from modules import Table, Chest, Hoe, Crate, Player, Item, ItemType, DirtBlock
+from modules import Table, Chest, Hoe, Crate, Player, Item, ItemType, DirtBlock, SellingPoint
 import math
 import pygame
 from pygame.locals import DOUBLEBUF, OPENGL
 from OpenGL.GL import *
-from OpenGL.GLU import gluPerspective, gluLookAt
+from OpenGL.GLU import gluPerspective, gluLookAt, gluOrtho2D
 from utils.load_texture import pls_load_texture
+from utils.texture_cache import TextureCache
 from OpenGL.GL import glBegin, glEnd, glVertex3f, glColor3f, GL_QUADS, glTexCoord2f
 
 
-camera_zoom_z = 10.0  # Starting camera distance
-MIN_ZOOM_Z = 3.0  # Closest zoom allowed
-MAX_ZOOM_Z = 20.0  # Furthest zoom allowed
+camera_zoom_z = 10.0 
+MIN_ZOOM_Z = 3.0 
+MAX_ZOOM_Z = 20.0 
 
 debug_mode = True
 
@@ -38,6 +39,82 @@ def draw_ground():
 
     glEnd()
     glBindTexture(GL_TEXTURE_2D, 0)
+
+
+def draw_coins_ui(window_width: int, window_height: int, coins: float):
+    """Draw coins display in top-right corner."""
+    glMatrixMode(GL_PROJECTION)
+    glPushMatrix()
+    glLoadIdentity()
+    gluOrtho2D(0, window_width, 0, window_height)
+    glMatrixMode(GL_MODELVIEW)
+    glPushMatrix()
+    glLoadIdentity()
+    glDisable(GL_DEPTH_TEST)
+    glEnable(GL_BLEND)
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+
+    coin_size = 30
+    padding = 10
+    pos_x = window_width - coin_size - padding
+    pos_y = window_height - coin_size - padding
+
+    # Draw coin texture
+    coin_texture_id = TextureCache.get_texture("assets/coin.png")
+    if coin_texture_id:
+        glBindTexture(GL_TEXTURE_2D, coin_texture_id)
+        glColor3f(1.0, 1.0, 1.0)
+        glBegin(GL_QUADS)
+        glTexCoord2f(0, 0)
+        glVertex2f(pos_x, pos_y)
+        glTexCoord2f(1, 0)
+        glVertex2f(pos_x + coin_size, pos_y)
+        glTexCoord2f(1, 1)
+        glVertex2f(pos_x + coin_size, pos_y + coin_size)
+        glTexCoord2f(0, 1)
+        glVertex2f(pos_x, pos_y + coin_size)
+        glEnd()
+        glBindTexture(GL_TEXTURE_2D, 0)
+
+    # Draw coin amount text
+    font = pygame.font.Font(None, 24)
+    text_surface = font.render(f"${coins:.1f}", True, (255, 255, 255))
+    text_data = pygame.image.tostring(text_surface, "RGBA", True)
+
+    text_id = glGenTextures(1)
+    glBindTexture(GL_TEXTURE_2D, text_id)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+    glTexImage2D(
+        GL_TEXTURE_2D, 0, GL_RGBA,
+        text_surface.get_width(), text_surface.get_height(),
+        0, GL_RGBA, GL_UNSIGNED_BYTE, text_data
+    )
+
+    text_x = pos_x - text_surface.get_width() - 10
+    text_y = pos_y + (coin_size - text_surface.get_height()) / 2
+
+    glColor3f(1.0, 1.0, 1.0)
+    glBegin(GL_QUADS)
+    glTexCoord2f(0, 0)
+    glVertex2f(text_x, text_y)
+    glTexCoord2f(1, 0)
+    glVertex2f(text_x + text_surface.get_width(), text_y)
+    glTexCoord2f(1, 1)
+    glVertex2f(text_x + text_surface.get_width(), text_y + text_surface.get_height())
+    glTexCoord2f(0, 1)
+    glVertex2f(text_x, text_y + text_surface.get_height())
+    glEnd()
+
+    glDeleteTextures([text_id])
+    glBindTexture(GL_TEXTURE_2D, 0)
+
+    glDisable(GL_BLEND)
+    glEnable(GL_DEPTH_TEST)
+    glPopMatrix()
+    glMatrixMode(GL_PROJECTION)
+    glPopMatrix()
+    glMatrixMode(GL_MODELVIEW)
 
 
 pygame.init()
@@ -80,6 +157,9 @@ world.add_object(Hoe(position=(8, 0.8, 0), size=(0.7, 0.7, 0.7)))
 world.add_object(DirtBlock(position=(-3, 0, 3), size=(1.0, 1.0, 1.0)))
 world.add_object(DirtBlock(position=(-2, 0, 3), size=(1.0, 1.0, 1.0)))
 world.add_object(DirtBlock(position=(-1, 0, 3), size=(1.0, 1.0, 1.0)))
+
+# Add selling point
+world.add_object(SellingPoint(position=(0, 0, -5), size=(1.5, 1.5, 1.5)))
 
 chest = Chest(position=(10, 0, 0))
 world.add_object(chest)
@@ -222,6 +302,7 @@ while running:
     # UI
     world.dialogue_box.draw(*display)
     world.player.hotbar.draw(*display)
+    draw_coins_ui(*display, world.player.coins)
 
     # paleyr inventory
     if world.player.inventory.is_open and not world.opened_chest:

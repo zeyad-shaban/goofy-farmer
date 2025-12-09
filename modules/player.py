@@ -20,6 +20,7 @@ class Player(Collidable):
         self.rotation_y: float = 0.0  # Rotation angle in degrees (around Y axis)
         self.inventory = Inventory(rows=3, cols=9)
         self.hotbar = Hotbar()
+        self.coins: float = 0.0  # Player's money
 
     def draw(self) -> None:
         # Apply rotation before drawing
