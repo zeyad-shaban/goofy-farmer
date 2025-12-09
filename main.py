@@ -1,5 +1,5 @@
 from game.game_world import GameWorld
-from modules import Table, Chest, Hoe, Crate, Player, Item, ItemType
+from modules import Table, Chest, Hoe, Crate, Player, Item, ItemType, DirtBlock
 import math
 import pygame
 from pygame.locals import DOUBLEBUF, OPENGL
@@ -63,12 +63,23 @@ world = GameWorld()
 player = Player(position=(0, 0, 0))
 world.add_object(player)
 
+# Give player starting items (debug only)
+if debug_mode:
+    player.hotbar.items[0] = Item(ItemType.HOE, 1)
+    player.inventory.add_item(Item(ItemType.TOMATO_SEED, 2))
+    player.inventory.add_item(Item(ItemType.TOMATO, 1))
+
 world.add_object(Crate(position=(5, 0, 0), size=(0.5, 0.5, 0.5)))
 world.add_object(Crate(position=(-5, 0, 0), size=(0.5, 0.5, 0.5)))
 world.add_object(Crate(position=(0, 0, 5), size=(0.5, 0.5, 0.5)))
 world.add_object(Crate(position=(3, 0, -3), size=(0.5, 0.5, 0.5)))
 world.add_object(Table(position=(8, 0, 0), size=(0.7, 0.7, 0.7)))
 world.add_object(Hoe(position=(8, 0.8, 0), size=(0.7, 0.7, 0.7)))
+
+# Add dirt blocks for farming
+world.add_object(DirtBlock(position=(-3, 0, 3), size=(1.0, 1.0, 1.0)))
+world.add_object(DirtBlock(position=(-2, 0, 3), size=(1.0, 1.0, 1.0)))
+world.add_object(DirtBlock(position=(-1, 0, 3), size=(1.0, 1.0, 1.0)))
 
 chest = Chest(position=(10, 0, 0))
 world.add_object(chest)

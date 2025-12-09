@@ -22,17 +22,28 @@ class Inventory:
 
     # todo modify this to stack if possible
     def add_item(self, item: Item) -> bool:
-        """Add item to first available slot."""
+        """Add item to first available slot, prioritizing stacking with existing items."""
+        # First pass: try to stack with existing items of same type
+        for row in range(self.rows):
+            for col in range(self.cols):
+                if self.items[row][col] is not None and self.items[row][col].type == item.type:
+                    # Stack with existing item
+                    if self.items[row][col].stack_size < self.items[row][col].max_stack:
+                        space = self.items[row][col].max_stack - self.items[row][col].stack_size
+                        if space >= item.stack_size:
+                            self.items[row][col].stack_size += item.stack_size
+                            return True
+                        else:
+                            # Partial stack
+                            self.items[row][col].stack_size += space
+                            item.stack_size -= space
+        
+        # Second pass: place remaining items in empty slots
         for row in range(self.rows):
             for col in range(self.cols):
                 if self.items[row][col] is None:
                     self.items[row][col] = item
                     return True
-                elif self.items[row][col].type == item.type:
-                    # Stack with existing item
-                    if self.items[row][col].stack_size < self.items[row][col].max_stack:
-                        self.items[row][col].stack_size += item.stack_size
-                        return True
         return False
     
     def remove_item(self, row: int, col: int) -> Optional[Item]:
@@ -164,13 +175,44 @@ class Inventory:
 
                     # Draw stack count if > 1
                     if item.stack_size > 1:
+                        # Draw white background for stack count
                         glColor3f(1.0, 1.0, 1.0)
                         glBegin(GL_QUADS)
-                        glVertex2f(x + self.slot_size - 8, y + 2)
+                        glVertex2f(x + self.slot_size - 12, y + 2)
                         glVertex2f(x + self.slot_size - 2, y + 2)
-                        glVertex2f(x + self.slot_size - 2, y + 8)
-                        glVertex2f(x + self.slot_size - 8, y + 8)
+                        glVertex2f(x + self.slot_size - 2, y + 12)
+                        glVertex2f(x + self.slot_size - 12, y + 12)
                         glEnd()
+                        
+                        # Render stack count text using pygame
+                        font = pygame.font.Font(None, 16)
+                        text_surface = font.render(str(item.stack_size), True, (0, 0, 0))
+                        text_data = pygame.image.tostring(text_surface, "RGBA", True)
+                        
+                        text_id = glGenTextures(1)
+                        glBindTexture(GL_TEXTURE_2D, text_id)
+                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+                        glTexImage2D(
+                            GL_TEXTURE_2D, 0, GL_RGBA,
+                            text_surface.get_width(), text_surface.get_height(),
+                            0, GL_RGBA, GL_UNSIGNED_BYTE, text_data
+                        )
+                        
+                        glColor3f(1.0, 1.0, 1.0)
+                        glBegin(GL_QUADS)
+                        glTexCoord2f(0, 0)
+                        glVertex2f(x + self.slot_size - 11, y + 3)
+                        glTexCoord2f(1, 0)
+                        glVertex2f(x + self.slot_size - 3, y + 3)
+                        glTexCoord2f(1, 1)
+                        glVertex2f(x + self.slot_size - 3, y + 11)
+                        glTexCoord2f(0, 1)
+                        glVertex2f(x + self.slot_size - 11, y + 11)
+                        glEnd()
+                        
+                        glDeleteTextures([text_id])
+                        glBindTexture(GL_TEXTURE_2D, 0)
 
                 # Draw border
                 glColor4f(*self.border_color)

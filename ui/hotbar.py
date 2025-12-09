@@ -29,16 +29,26 @@ class Hotbar:
         self.selected_slot = (self.selected_slot + direction) % self.slot_count
 
     def add_item(self, item) -> bool:
-        """Add item to first available hotbar slot."""
+        """Add item to first available hotbar slot, prioritizing stacking with existing items."""
+        # First pass: try to stack with existing items of same type
+        for i in range(self.slot_count):
+            if self.items[i] is not None and self.items[i].type == item.type:
+                # Stack with existing item
+                if self.items[i].stack_size < self.items[i].max_stack:
+                    space = self.items[i].max_stack - self.items[i].stack_size
+                    if space >= item.stack_size:
+                        self.items[i].stack_size += item.stack_size
+                        return True
+                    else:
+                        # Partial stack
+                        self.items[i].stack_size += space
+                        item.stack_size -= space
+        
+        # Second pass: place remaining items in empty slots
         for i in range(self.slot_count):
             if self.items[i] is None:
                 self.items[i] = item
                 return True
-            elif self.items[i].type == item.type:
-                # Stack with existing item
-                if self.items[i].stack_size < self.items[i].max_stack:
-                    self.items[i].stack_size += item.stack_size
-                    return True
         return False
 
     def draw(self, window_width: int, window_height: int):
@@ -113,13 +123,44 @@ class Hotbar:
 
                 # Draw stack count if > 1
                 if item.stack_size > 1:
+                    # Draw white background for stack count
                     glColor3f(1.0, 1.0, 1.0)
                     glBegin(GL_QUADS)
-                    glVertex2f(slot_x + slot_size - 20, slot_y)
-                    glVertex2f(slot_x + slot_size, slot_y)
-                    glVertex2f(slot_x + slot_size, slot_y + 20)
-                    glVertex2f(slot_x + slot_size - 20, slot_y + 20)
+                    glVertex2f(slot_x + slot_size - 18, slot_y + 2)
+                    glVertex2f(slot_x + slot_size - 2, slot_y + 2)
+                    glVertex2f(slot_x + slot_size - 2, slot_y + 18)
+                    glVertex2f(slot_x + slot_size - 18, slot_y + 18)
                     glEnd()
+                    
+                    # Render stack count text using pygame
+                    font = pygame.font.Font(None, 20)
+                    text_surface = font.render(str(item.stack_size), True, (0, 0, 0))
+                    text_data = pygame.image.tostring(text_surface, "RGBA", True)
+                    
+                    text_id = glGenTextures(1)
+                    glBindTexture(GL_TEXTURE_2D, text_id)
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+                    glTexImage2D(
+                        GL_TEXTURE_2D, 0, GL_RGBA,
+                        text_surface.get_width(), text_surface.get_height(),
+                        0, GL_RGBA, GL_UNSIGNED_BYTE, text_data
+                    )
+                    
+                    glColor3f(1.0, 1.0, 1.0)
+                    glBegin(GL_QUADS)
+                    glTexCoord2f(0, 0)
+                    glVertex2f(slot_x + slot_size - 16, slot_y + 4)
+                    glTexCoord2f(1, 0)
+                    glVertex2f(slot_x + slot_size - 4, slot_y + 4)
+                    glTexCoord2f(1, 1)
+                    glVertex2f(slot_x + slot_size - 4, slot_y + 16)
+                    glTexCoord2f(0, 1)
+                    glVertex2f(slot_x + slot_size - 16, slot_y + 16)
+                    glEnd()
+                    
+                    glDeleteTextures([text_id])
+                    glBindTexture(GL_TEXTURE_2D, 0)
 
             # Draw border
             glColor4f(1.0, 1.0, 1.0, 1.0)

@@ -4,6 +4,7 @@ from typing import Optional, Tuple
 
 class ItemType(Enum):
     TOMATO_SEED = "tomato_seed"
+    TOMATO = "tomato"
     BURGER = "burger"
     HOE = "hoe"
 
@@ -18,6 +19,7 @@ class Item:
         """Return color for rendering in inventory slots (fallback if no texture)."""
         colors = {
             ItemType.TOMATO_SEED: (0.8, 0.2, 0.2),  # Red
+            ItemType.TOMATO: (0.9, 0.3, 0.2),  # Dark red
             ItemType.BURGER: (0.8, 0.6, 0.2),  # Yellow-brown
             ItemType.HOE: (0, 0, 0), # Black
         }
@@ -27,6 +29,7 @@ class Item:
         """Return display name."""
         names = {
             ItemType.TOMATO_SEED: "Tomato Seed",
+            ItemType.TOMATO: "Tomato",
             ItemType.BURGER: "Burger",
             ItemType.HOE: "Hoe",
         }
@@ -36,6 +39,7 @@ class Item:
         """Return path to texture image for this item."""
         texture_paths = {
             ItemType.TOMATO_SEED: "assets/tomato_seed.png",
+            ItemType.TOMATO: "assets/tomato.png",
             ItemType.BURGER: "assets/burger.png",
             ItemType.HOE: "assets/hoe.png",
         }
