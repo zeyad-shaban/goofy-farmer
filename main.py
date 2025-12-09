@@ -137,8 +137,9 @@ while running:
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if world.opened_chest:
-                if event.button == 1:  # Left click
-                    world.handle_inventory_click(event.pos[0], event.pos[1], display[0], display[1])
+                world.handle_inventory_click(event.pos[0], event.pos[1], *display)
+            elif world.player.inventory.is_open:
+                world.handle_inventory_click(event.pos[0], event.pos[1], *display)
 
             else:
                 if keys[pygame.K_LCTRL] or keys[pygame.K_RCTRL]:

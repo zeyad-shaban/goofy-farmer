@@ -3,6 +3,7 @@ from typing import List, Optional
 import pygame
 from OpenGL.GL import *
 from OpenGL.GLU import *
+from utils.texture_cache import TextureCache
 
 
 class Inventory:
@@ -130,14 +131,46 @@ class Inventory:
                 # Draw item if present
                 item = self.items[row][col]
                 if item:
-                    glColor3f(*item.get_color())
-                    item_margin = 5
-                    glBegin(GL_QUADS)
-                    glVertex2f(x + item_margin, y + item_margin)
-                    glVertex2f(x + self.slot_size - item_margin, y + item_margin)
-                    glVertex2f(x + self.slot_size - item_margin, y + self.slot_size - item_margin)
-                    glVertex2f(x + item_margin, y + self.slot_size - item_margin)
-                    glEnd()
+                    # Try to load and draw texture
+                    texture_path = item.get_texture_path()
+                    texture_id = TextureCache.get_texture(texture_path) if texture_path else None
+                    
+                    if texture_id:
+                        # Draw textured quad
+                        glBindTexture(GL_TEXTURE_2D, texture_id)
+                        glColor3f(1.0, 1.0, 1.0)
+                        item_margin = 5
+                        glBegin(GL_QUADS)
+                        glTexCoord2f(0, 0)
+                        glVertex2f(x + item_margin, y + item_margin)
+                        glTexCoord2f(1, 0)
+                        glVertex2f(x + self.slot_size - item_margin, y + item_margin)
+                        glTexCoord2f(1, 1)
+                        glVertex2f(x + self.slot_size - item_margin, y + self.slot_size - item_margin)
+                        glTexCoord2f(0, 1)
+                        glVertex2f(x + item_margin, y + self.slot_size - item_margin)
+                        glEnd()
+                        glBindTexture(GL_TEXTURE_2D, 0)
+                    else:
+                        # Fallback to color if texture not found
+                        glColor3f(*item.get_color())
+                        item_margin = 5
+                        glBegin(GL_QUADS)
+                        glVertex2f(x + item_margin, y + item_margin)
+                        glVertex2f(x + self.slot_size - item_margin, y + item_margin)
+                        glVertex2f(x + self.slot_size - item_margin, y + self.slot_size - item_margin)
+                        glVertex2f(x + item_margin, y + self.slot_size - item_margin)
+                        glEnd()
+
+                    # Draw stack count if > 1
+                    if item.stack_size > 1:
+                        glColor3f(1.0, 1.0, 1.0)
+                        glBegin(GL_QUADS)
+                        glVertex2f(x + self.slot_size - 8, y + 2)
+                        glVertex2f(x + self.slot_size - 2, y + 2)
+                        glVertex2f(x + self.slot_size - 2, y + 8)
+                        glVertex2f(x + self.slot_size - 8, y + 8)
+                        glEnd()
 
                 # Draw border
                 glColor4f(*self.border_color)

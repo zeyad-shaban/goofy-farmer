@@ -15,7 +15,7 @@ class Item:
         self.max_stack = 64
 
     def get_color(self) -> Tuple[float, float, float]:
-        """Return color for rendering in inventory slots."""
+        """Return color for rendering in inventory slots (fallback if no texture)."""
         colors = {
             ItemType.TOMATO_SEED: (0.8, 0.2, 0.2),  # Red
             ItemType.BURGER: (0.8, 0.6, 0.2),  # Yellow-brown
@@ -31,3 +31,12 @@ class Item:
             ItemType.HOE: "Hoe",
         }
         return names.get(self.type, "Unknown")
+
+    def get_texture_path(self) -> Optional[str]:
+        """Return path to texture image for this item."""
+        texture_paths = {
+            ItemType.TOMATO_SEED: "assets/tomato_seed.png",
+            ItemType.BURGER: "assets/burger.png",
+            ItemType.HOE: "assets/hoe.png",
+        }
+        return texture_paths.get(self.type, None)
