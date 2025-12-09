@@ -112,10 +112,11 @@ class DirtBlock(Collidable, Interactable):
                 return "Inventory full!"
 
         elif self.planted_item_type == ItemType.BURGER:
-            # Give cow as harvest
+            # Give cow + 2 burgers as harvest
             harvest_item = Item(ItemType.COW, 1)
+            harvest_burgers = Item(ItemType.BURGER, 2)
             
-            if player.add_item(harvest_item):
+            if player.add_item(harvest_item) and player.add_item(harvest_burgers):
                 self.uses_remaining -= 1
                 
                 # Check if this block has been used 3 times
@@ -124,12 +125,12 @@ class DirtBlock(Collidable, Interactable):
                     self.state = BlockState.DIRT
                     self.planted_item_type = None
                     self.uses_remaining = 3
-                    return "Harvested cow! Block returned to dirt."
+                    return "Harvested cow + 2 burgers! Block returned to dirt."
                 else:
                     # Return to farmland for replanting
                     self.state = BlockState.FARMLAND
                     self.planted_item_type = None
-                    return f"Harvested cow! Block ready to replant. ({self.uses_remaining} uses left)"
+                    return f"Harvested cow + 2 burgers! Block ready to replant. ({self.uses_remaining} uses left)"
             else:
                 return "Inventory full!"
 

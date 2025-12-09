@@ -14,7 +14,7 @@ camera_zoom_z = 10.0
 MIN_ZOOM_Z = 3.0 
 MAX_ZOOM_Z = 20.0 
 
-debug_mode = True
+debug_mode = False
 
 
 def draw_ground():
