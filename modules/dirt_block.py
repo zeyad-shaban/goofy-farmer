@@ -36,13 +36,11 @@ class DirtBlock(Collidable, Interactable):
         if not isinstance(interactor, Player):
             return "Cannot interact"
 
-        # Check if player is holding a hoe (must be selected in hotbar)
         is_holding_hoe = (
             interactor.hotbar.items[interactor.hotbar.selected_slot] is not None
             and interactor.hotbar.items[interactor.hotbar.selected_slot].type == ItemType.HOE
         )
 
-        # State: DIRT -> Can be tilled with hoe
         if self.state == BlockState.DIRT:
             if is_holding_hoe:
                 self.state = BlockState.FARMLAND

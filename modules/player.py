@@ -17,10 +17,10 @@ class Player(Collidable):
         self.velocity: Vec3 = (0.0, 0.0, 0.0)
         self.speed: float = 5.0
         self.interaction_range: float = 3.0
-        self.rotation_y: float = 0.0  # Rotation angle in degrees (around Y axis)
+        self.rotation_y: float = 0.0
         self.inventory = Inventory(rows=3, cols=9)
         self.hotbar = Hotbar()
-        self.coins: float = 0.0  # Player's money
+        self.coins: float = 0.0
 
     def draw(self) -> None:
         # Apply rotation before drawing
@@ -320,7 +320,6 @@ class Player(Collidable):
             self.position[2] + move_delta[2],
         )
 
-        # Check collision at new position
         old_position = self.position
         self.position = new_position
 
@@ -331,7 +330,6 @@ class Player(Collidable):
                 break
 
         if collision_detected:
-            # Revert to old position if collision detected
             self.position = old_position
             self.velocity = (0.0, 0.0, 0.0)
         else:
@@ -351,7 +349,6 @@ class Player(Collidable):
 
         for obj in objects:
             if isinstance(obj, Interactable):
-                # Calculate distance
                 dx = obj.position[0] - self.position[0]
                 dy = obj.position[1] - self.position[1]
                 dz = obj.position[2] - self.position[2]

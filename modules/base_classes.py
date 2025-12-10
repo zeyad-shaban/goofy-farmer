@@ -102,7 +102,7 @@ class Pickable(ABC):
     """Interface for objects that can be picked up by the player."""
 
     @abstractmethod
-    def get_item_type(self) -> "ItemType":
+    def get_item_type(self) -> "ItemType": # type: ignore
         """Return the item type when picked up."""
         pass
 

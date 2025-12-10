@@ -10,11 +10,11 @@ from utils.texture_cache import TextureCache
 from OpenGL.GL import glBegin, glEnd, glVertex3f, glColor3f, GL_QUADS, glTexCoord2f
 
 
-camera_zoom_z = 10.0 
-MIN_ZOOM_Z = 3.0 
-MAX_ZOOM_Z = 20.0 
+camera_zoom_z = 10.0
+MIN_ZOOM_Z = 3.0
+MAX_ZOOM_Z = 20.0
 
-debug_mode = False
+debug_mode = True
 
 
 def draw_ground():
@@ -85,11 +85,7 @@ def draw_coins_ui(window_width: int, window_height: int, coins: float):
     glBindTexture(GL_TEXTURE_2D, text_id)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-    glTexImage2D(
-        GL_TEXTURE_2D, 0, GL_RGBA,
-        text_surface.get_width(), text_surface.get_height(),
-        0, GL_RGBA, GL_UNSIGNED_BYTE, text_data
-    )
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, text_surface.get_width(), text_surface.get_height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, text_data)
 
     text_x = pos_x - text_surface.get_width() - 10
     text_y = pos_y + (coin_size - text_surface.get_height()) / 2

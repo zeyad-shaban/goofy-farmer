@@ -21,19 +21,16 @@ class SellingPoint(Collidable, Interactable):
         if not isinstance(interactor, Player):
             return "Cannot sell"
 
-        # Get the item in the player's selected hotbar slot
         hotbar_item = interactor.hotbar.items[interactor.hotbar.selected_slot]
         
         if hotbar_item is None:
             return "You're not holding anything to sell!"
 
-        # Get the price
-        price = hotbar_item.get_price()
+        price = hotbar_item.get_price() # type: ignore
         
         if price <= 0:
             return f"Can't sell {hotbar_item.get_name()}!"
 
-        # Sell one item
         interactor.coins += price
         hotbar_item.stack_size -= 1
         
