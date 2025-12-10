@@ -2,6 +2,8 @@ from modules.base_classes import Collidable, Interactable, BoundingBox, Vec3
 from modules.items import Item, ItemType
 from OpenGL.GL import *
 from OpenGL.GLU import *
+import pygame
+import os
 
 
 class SellingPoint(Collidable, Interactable):
@@ -37,7 +39,20 @@ class SellingPoint(Collidable, Interactable):
         if hotbar_item.stack_size <= 0:
             interactor.hotbar.items[interactor.hotbar.selected_slot] = None
 
+        # Play sell sound
+        self._play_sell_sound()
+
         return f"Sold {hotbar_item.get_name()} for ${price}!"
+    
+    def _play_sell_sound(self) -> None:
+        """Play the sell sound effect."""
+        sound_path = "./assets/sell.mp3"
+        try:
+            if os.path.exists(sound_path):
+                sound = pygame.mixer.Sound(sound_path)
+                sound.play()
+        except Exception as e:
+            print(f"Failed to play sell sound: {e}")
 
     def get_interaction_prompt(self) -> str:
         """Return interaction prompt text."""
