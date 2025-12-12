@@ -114,6 +114,19 @@ def draw_coins_ui(window_width: int, window_height: int, coins: float):
 
 
 pygame.init()
+pygame.mixer.pre_init(44100, -16, 2, 512)
+pygame.mixer.init()
+
+try:
+    pygame.mixer.music.load("assets/bg.mp3")
+    pygame.mixer.music.set_volume(0.5)
+    pygame.mixer.music.play(-1)
+except Exception as e:
+    print("Failed to load music:", e)
+
+music_muted = False
+stored_volume = 0.5
+
 display = (800, 600)
 pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
 pygame.display.set_caption("3D Game with Interactions + Zoom")
@@ -313,4 +326,6 @@ while running:
 
     pygame.display.flip()
 
+pygame.mixer.music.stop()
+pygame.mixer.quit()
 pygame.quit()
